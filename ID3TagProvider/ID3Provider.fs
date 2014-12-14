@@ -39,14 +39,14 @@ type ID3TagProvider() as this =
 
           makeProvidedMethod<bool>
             "HasTag"
-            ([ ProvidedParameter("tag", typeof<string>) ])
+            ([ makeProvidedParameter<string> "tag" ])
             (fun [ tags; tag ] -> <@@ ((%%tags:obj) :?> Dictionary<string, ID3Frame>).ContainsKey(%%tag:string) @@>)
           |> addDelayedXmlComment "Returns a value indicating whether the specified tag was located within the source file"
           |> ty.AddMember
 
           makeProvidedMethod<ID3Frame option>
             "GetTag"
-            [ ProvidedParameter("tag", typeof<string>)]
+            [ makeProvidedParameter<string> "tag" ]
             (fun [ tags; tag ] -> <@@ let tagDict = ((%%tags:obj) :?> Dictionary<string, ID3Frame>)
                                       if tagDict.ContainsKey(%%tag:string) then Some tagDict.[(%%tag:string)]
                                       else None @@>)

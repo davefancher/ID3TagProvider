@@ -8,8 +8,8 @@ open System.Windows.Forms
 open DidacticCode.TypeProviders
 open DidacticCode.ID3
 
-let song = new AudioFile< @"D:\Music\Tim Berg\Seek Bromance\01 Seek Bromance (Avicii Vocal Edit).mp3">()
-//let song = new AudioFile< @"D:\Music\Afrojack\Take Over Control\02 Take Over Control (Feat  Eva Simons).mp3">()
+//let song = new AudioFile< @"D:\Music\Tim Berg\Seek Bromance\01 Seek Bromance (Avicii Vocal Edit).mp3">()
+let song = new AudioFile< @"D:\Music\Afrojack\Take Over Control\02 Take Over Control (Feat  Eva Simons).mp3">()
 //let song = new AudioFile< @"D:\Music\Tiësto\Kaleidoscope\02 Escape Me.mp3">()
 
 //if song.HasTag "TIT2" then song.GetTag "TIT2" |> function | Some (TIT2 title) -> printfn "%s" title | _ -> ()

@@ -34,6 +34,7 @@ type ID3TagProvider() as this =
           makeProvidedConstructor
               [ ]
               (fun [] -> <@@ fileName |> ID3Reader.readID3Tags @@>)
+          |> addDelayedXmlComment "Creates a reader for the specified file."
           |> ty.AddMember
 
           makeProvidedMethod<bool>
@@ -56,55 +57,55 @@ type ID3TagProvider() as this =
           |> ID3Reader.readID3Tags
           |> Seq.map (fun i -> match i.Key with
                                 | "APIC" as tag ->
-                                    makeProvidedProperty<AttachedPicture> "AttachedPicture" tag (buildExpr tag)
+                                    makeProvidedProperty<AttachedPicture> "AttachedPicture" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the album art attached to the file. Corresponds to the APIC tag."
                                 | "MCDI" as tag ->
-                                    makeProvidedProperty<string> "CdIdentifier" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "CdIdentifier" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the CD Identifier. Corresponds to the MCDI tag."
                                 | "POPM" as tag ->
-                                    makeProvidedProperty<Popularimeter> "Popularimeter" tag (buildExpr tag)
+                                    makeProvidedProperty<Popularimeter> "Popularimeter" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the Popularimeter data including play count and rating. Corresponds to the POPM tag."
                                 | "TALB" as tag ->
-                                    makeProvidedProperty<string> "AlbumTitle" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "AlbumTitle" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the album title. Corresponds to the TALB tag."
                                 | "TIT1" as tag ->
-                                    makeProvidedProperty<string> "ContentGroup" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "ContentGroup" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the content group. Corresponds to the TIT1 tag."
                                 | "TIT2" as tag ->
-                                    makeProvidedProperty<string> "TrackTitle" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "TrackTitle" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track title. Corresponds to the TIT2 tag."
                                 | "TIT3" as tag ->
-                                    makeProvidedProperty<string> "TrackSubtitle" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "TrackSubtitle" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track subtitle. Corresponds to the TIT3 tag."
                                 | "TRCK" as tag ->
-                                    makeProvidedProperty<string> "TrackNumber" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "TrackNumber" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track number. Corresponds to the TRCK tag."
                                 | "TYER" as tag ->
-                                    makeProvidedProperty<string> "Year" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "Year" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the year the track was released. Corresponds to the TYER tag."
                                 | "TPE1" as tag ->
-                                    makeProvidedProperty<string> "Performer" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "Performer" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track performer's name. Corresponds to the TPE1 tag."
                                 | "TPE2" as tag ->
-                                    makeProvidedProperty<string> "Band" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "Band" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the band name. Corresponds to the TPE2 tag."
                                 | "TPOS" as tag ->
-                                    makeProvidedProperty<string> "SetIdentifier" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "SetIdentifier" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track's position within the set. Corresponds to the TPOS tag."
                                 | "TPUB" as tag ->
-                                    makeProvidedProperty<string> "Publisher" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "Publisher" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track publisher's name. Corresponds to the TPUB tag."
                                 | "TCOM" as tag ->
-                                    makeProvidedProperty<string> "Composer" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "Composer" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track composer's name. Corresponds to the TCOM tag."
                                 | "TCON" as tag ->
-                                    makeProvidedProperty<string> "ContentType" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "ContentType" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the track's content type. Corresponds to the TCON tag."
                                 | "TCOP" as tag ->
-                                    makeProvidedProperty<string> "Copyright" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "Copyright" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the copyright information for the track. Corresponds to the TCOP tag."
                                 | "TLEN" as tag ->
-                                    makeProvidedProperty<string> "TrackLength" tag (buildExpr tag)
+                                    makeProvidedProperty<string> "TrackLength" (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the length of the track. Corresponds to the TLEN tag.")
           |> Seq.toList
           |> ty.AddMembers

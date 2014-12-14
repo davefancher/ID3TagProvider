@@ -1,0 +1,7 @@
+d:\dev\sandbox\ID3TagProvider\ID3TagProvider\bin\Debug\ID3TagProvider.XML
+d:\dev\sandbox\ID3TagProvider\ID3TagProvider\bin\Debug\ID3TagProvider.dll
+d:\dev\sandbox\ID3TagProvider\ID3TagProvider\bin\Debug\ID3TagProvider.pdb
+d:\dev\sandbox\ID3TagProvider\ID3TagProvider\bin\Debug\FSharp.Core.dll
+d:\dev\sandbox\ID3TagProvider\ID3TagProvider\bin\Debug\FSharp.Core.xml
+d:\dev\sandbox\ID3TagProvider\ID3TagProvider\obj\Debug\ID3TagProvider.dll
+d:\dev\sandbox\ID3TagProvider\ID3TagProvider\obj\Debug\ID3TagProvider.pdb

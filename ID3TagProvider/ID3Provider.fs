@@ -19,13 +19,13 @@ type ID3TagProvider() as this =
   let ns = "DidacticCode.TypeProviders"
   let assy = Assembly.GetExecutingAssembly()
 
-  let taggedFileType = ProvidedTypeDefinition(assy, ns, "AudioFile", None)
+  let audioFileType = ProvidedTypeDefinition(assy, ns, "AudioFile", None)
 
   let buildExpr tag =
     fun [tags] -> <@@ (((%%tags:obj) :?> Dictionary<string, ID3Frame>).[tag]).GetContent() |> unbox @@>
 
   do
-    taggedFileType.DefineStaticParameters(
+    audioFileType.DefineStaticParameters(
       [ ProvidedStaticParameter("fileName", typeof<string>) ],
       instantiationFunction = (
         fun typeName [| :? string as fileName |] -> 
@@ -114,7 +114,7 @@ type ID3TagProvider() as this =
       ))
 
   do
-    this.AddNamespace(ns, [ taggedFileType ])
+    this.AddNamespace(ns, [ audioFileType ])
 
 [<assembly:TypeProviderAssembly>]
 do ()

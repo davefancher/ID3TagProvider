@@ -9,10 +9,10 @@ open ProviderImplementation.ProvidedTypes
 let inline makeProvidedConstructor parameters invokeCode =
   ProvidedConstructor(parameters, InvokeCode = invokeCode)
 
-let inline makeProvidedProperty< ^T> propName getterCode =
+let inline makeReadOnlyProvidedProperty< ^T> getterCode propName =
   ProvidedProperty(propName, typeof< ^T>, GetterCode = getterCode)
 
-let inline makeProvidedMethod< ^T> methodName parameters invokeCode =
+let inline makeProvidedMethod< ^T> parameters invokeCode methodName =
   ProvidedMethod(methodName, parameters, typeof< ^T>, InvokeCode = invokeCode)
 
 let inline makeProvidedParameter< ^T> paramName =

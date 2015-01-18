@@ -46,7 +46,6 @@
     <Compile Include="ProvidedTypes.fsi" />
     <Compile Include="ProvidedTypes.fs" />
     <Compile Include="ProvidedTypesHelpers.fs" />
-    <Compile Include="DebugProvidedTypes.fs" />
     <Compile Include="ID3Provider.fs" />
     <None Include="Scratchpad.fsx" />
     <None Include="packages.config" />

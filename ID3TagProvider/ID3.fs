@@ -7,6 +7,11 @@ open System.Text
 open Microsoft.FSharp.Core.LanguagePrimitives
 
 [<AutoOpen>]
+module CoreExtensions =
+  let inline tee fn x = x |> fn |> ignore; x
+  let inline (|>!) x fn = tee fn x
+
+[<AutoOpen>]
 module BinaryReaderExtensions =
   let private synchsafeIntToUInt32 synchsafe =
     (synchsafe &&& 0x7Fu) ||| ((synchsafe &&& 0x7F00u) >>> 1) ||| ((synchsafe &&& 0x7F0000u) >>> 2) ||| ((synchsafe &&& 0x7F000000u) >>> 3)
@@ -43,9 +48,6 @@ type ID3Frame =
 | TCON of string
 | TCOP of string
 | TLEN of string
-  // I didn't like putting this function here but I couldn't get the
-  // type provider code to locate these types. By making this part
-  // of the ID3Frame DU, the quotation expressions handled them properly
   member x.GetContent () =
     match x with
     | APIC pic -> box pic
@@ -66,20 +68,30 @@ type ID3Frame =
     | TCOP content
     | TLEN content -> box content
 
-module ID3Reader =
-  let rec private readQueueThroughNextNullByte (q: Queue<byte>) (sb: StringBuilder) =
-    match q.Dequeue() with
-    | 0x00uy -> sb.ToString()
-    | c -> c |> char |> sb.Append |> readQueueThroughNextNullByte q
+type ByteArrayReader (byteArray: byte array) =
+  let enumerator = byteArray.GetEnumerator() |>! (fun e -> e.MoveNext())
+  member __.ReadByte () =
+    enumerator.Current :?> byte |>! (fun _ -> enumerator.MoveNext())
+  member __.ReadString () =
+    let rec read (sb: StringBuilder) =
+      match __.ReadByte() with
+      | 0x00uy -> sb.ToString()
+      | c -> c |> char |> sb.Append |> read
+    read (StringBuilder())
+  member __.ReadToEnd() =
+    seq { yield enumerator.Current :?> byte
+          while enumerator.MoveNext() do
+            yield enumerator.Current :?> byte }
 
+module ID3Reader =
   let private readAPICFrame (content: byte array) =
-    let q = Queue content
+    let reader = ByteArrayReader content
     APIC {
-      TextEncoding = q.Dequeue()
-      MimeType = StringBuilder() |> readQueueThroughNextNullByte q |> function | "" -> "image/" | s -> s
-      PictureType = q.Dequeue()
-      Description = StringBuilder() |> readQueueThroughNextNullByte q
-      Image = q |> Array.ofSeq }
+      TextEncoding = reader.ReadByte()
+      MimeType = reader.ReadString() |> function | "" -> "image/" | s -> s
+      PictureType = reader.ReadByte()
+      Description = reader.ReadString()
+      Image = reader.ReadToEnd() |> Array.ofSeq }
   let private readMCDIFrame = Encoding.ASCII.GetString >> MCDI
   let private readPOPMFrame (content: byte array) =
     POPM { 
@@ -109,7 +121,7 @@ module ID3Reader =
 
       match id with
       | "APIC" -> Some (id, content |> readAPICFrame)
-      | "MCDI" -> Some (id, content.[1..] |> readMCDIFrame) // There's an encoding byte that I'm ignoring for now
+      | "MCDI" -> Some (id, content.[1..] |> readMCDIFrame) // There's an encoding byte being ignored on these
       | "POPM" -> Some (id, content |> readPOPMFrame)
       | "TALB" -> Some (id, content.[1..] |> readTALBFrame)
       | "TIT1" -> Some (id, content.[1..] |> readTIT1Frame)
@@ -132,34 +144,32 @@ module ID3Reader =
   let private readID3Header (reader: BinaryReader) =
     let id = reader.ReadBytes 3 |> Encoding.ASCII.GetString
     let version = reader.ReadBytes 2
-    reader.SkipBytes 1  // These bytes represent the header flags; skipping them for now
+    // The next byte represent the header flags which aren't supported in this simple reader
+    reader.SkipBytes 1
     let size = reader.ReadSynchSafeInteger()
     { Identifier = id; Version = version; Size = size }
 
-  // This should really keep better track of the tags since there are a number of
-  // tags such as APIC that can be repeated but for the purpose of this exercise
+  // A proper implementation would keep better track of the tags since there are a number of
+  // tags such as APIC that can be repeated. For the purpose of this exercise
   // we'll just use the most recently found value
-  let private readID3Frames (header: ID3Header) (reader: BinaryReader) =
+  let private readFrames (header: ID3Header) (reader: BinaryReader) =
     let rec getFramesImpl (frames: Dictionary<string, ID3Frame>) =
       match reader.BaseStream.Position with
       | p when p >= int64 (header.Size + 3u) ->
         frames
       | _ ->
-        (match (reader |> readFrame) with
+        (match readFrame reader with
          | Some (id, frame) ->
-            frames.[id] <- frame
-            frames
+            frames |>! (fun f -> f.[id] <- frame)
          | _ ->
             frames)
         |> getFramesImpl
-
     Dictionary<string, ID3Frame>() |> getFramesImpl
 
   let private openFileForRead fileName = new FileStream(fileName, FileMode.Open, FileAccess.Read)
   let private createBinaryReader input = new BinaryReader(input)
 
-  let readID3Tags fn =
+  let readID3Frames fn =
     use reader = fn |> openFileForRead |> createBinaryReader
     let header = reader |> readID3Header
-    let tags = reader |> readID3Frames header
-    tags
+    reader |> readFrames header

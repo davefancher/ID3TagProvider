@@ -13,7 +13,7 @@ let sourceFile = @"D:\Music\Tim Berg\Seek Bromance\01 Seek Bromance (Avicii Voca
 
 let tags =
   sourceFile
-  |> ID3Reader.readID3Tags
+  |> ID3Reader.readID3Frames
 
 tags
 |> Seq.iter (printfn "%A")

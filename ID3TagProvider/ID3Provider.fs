@@ -33,7 +33,7 @@ type ID3TagProvider() as this =
 
           makeProvidedConstructor
               [ ]
-              (fun [] -> <@@ fileName |> ID3Reader.readID3Tags @@>)
+              (fun [] -> <@@ fileName |> ID3Reader.readID3Frames @@>)
           |> addDelayedXmlComment "Creates a reader for the specified file."
           |> ty.AddMember
 
@@ -54,7 +54,7 @@ type ID3TagProvider() as this =
           |> ty.AddMember
 
           fileName
-          |> ID3Reader.readID3Tags
+          |> ID3Reader.readID3Frames
           |> Seq.map (fun i -> match i.Key with
                                 | "APIC" as tag ->
                                     "AttachedPicture"
@@ -62,20 +62,17 @@ type ID3TagProvider() as this =
                                     |> addDelayedXmlComment "Gets the album art attached to the file. Corresponds to the APIC tag."
                                 | "MCDI" as tag ->
                                     "CdIdentifier"
-                                    |> makeReadOnlyProvidedProperty<string> (buildExpr tag)
-                                    |> addDelayedXmlComment "Gets the CD Identifier. Corresponds to the MCDI tag."
+                                    |> makeTagPropertyWithComment tag "Gets the CD Identifier. Corresponds to the MCDI tag."
                                 | "POPM" as tag ->
                                     "Popularimeter"
                                     |> makeReadOnlyProvidedProperty<Popularimeter> (buildExpr tag)
                                     |> addDelayedXmlComment "Gets the Popularimeter data including play count and rating. Corresponds to the POPM tag."
                                 | "TALB" as tag ->
                                     "AlbumTitle"
-                                    |> makeReadOnlyProvidedProperty<string>  (buildExpr tag)
-                                    |> addDelayedXmlComment "Gets the album title. Corresponds to the TALB tag."
+                                    |> makeTagPropertyWithComment tag "Gets the album title. Corresponds to the TALB tag."
                                 | "TIT1" as tag ->
                                     "ContentGroup"
-                                    |> makeReadOnlyProvidedProperty<string> (buildExpr tag)
-                                    |> addDelayedXmlComment "Gets the content group. Corresponds to the TIT1 tag."
+                                    |> makeTagPropertyWithComment tag "Gets the content group. Corresponds to the TIT1 tag."
                                 | "TIT2" as tag ->
                                     "TrackTitle"
                                     |> makeReadOnlyProvidedProperty<string> (buildExpr tag)
